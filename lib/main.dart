@@ -59,20 +59,34 @@ class _MyAppState extends State<MyApp> {
           value: Auth(),
         ),
         ChangeNotifierProxyProvider<Auth, Products>(
-          create: (ctx)=>Products(_auth.token,_products.items),
           update: (ctx, auth, previousProducts) => Products(
             auth.token,
             previousProducts == null ? [] : previousProducts.items,
           ),
         ),
+//        ChangeNotifierProxyProvider<Auth, Products>(
+//          create: (ctx)=>Products(_auth.token,_products.items),
+//          update: (ctx, auth, previousProducts) => Products(
+//            auth.token,
+//            previousProducts == null ? [] : previousProducts.items,
+//          ),
+//        ),
+
         ChangeNotifierProvider.value(
           value: Cart(),
           // create: (ctx) => Cart(),
         ),
-        ChangeNotifierProvider.value(
+        ChangeNotifierProxyProvider<Auth, Orders>(
+          update: (ctx, auth, previousOrders) => Orders(
+            auth.token,
+            previousOrders == null ? [] : previousOrders.orders,
+          ),
+        ),
+
+    /*    ChangeNotifierProvider.value(
           value: Orders(),
           //create: (ctx) => Orders(),
-        ),
+        ),*/
       ],
       child: Consumer<Auth>(
         builder: (ctx, auth, _) => MaterialApp(

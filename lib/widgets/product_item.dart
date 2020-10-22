@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_max/localization/localization_constants.dart';
+import 'package:shop_max/providers/auth.dart';
 import 'package:shop_max/providers/cart.dart';
 import 'package:shop_max/providers/product.dart';
 import 'package:shop_max/screens/product_detail_screen.dart';
@@ -22,7 +23,8 @@ class ProductItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final product = Provider.of<Product>(context, listen: false);
     final cart = Provider.of<Cart>(context, listen: false);
-    //print('product rebuild!!');
+    final authData = Provider.of<Auth>(context,listen: false);
+
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -51,15 +53,7 @@ class ProductItem extends StatelessWidget {
               icon: Icon(
                   product.isFavorite ? Icons.favorite : Icons.favorite_border),
               onPressed: () {
-                product.toggleFavoriteStatus();
-
-//                Toast.show(
-//                    product.isFavorite
-//                        ? getTranslated(context, 'added_to_favorite')
-//                        : getTranslated(context, 'Removed_to_favorite'),
-//                    context,
-//                    duration: Toast.LENGTH_SHORT,
-//                    gravity: Toast.BOTTOM);
+                product.toggleFavoriteStatus(authData.token);
               },
               color: Theme.of(context).accentColor,
             ),

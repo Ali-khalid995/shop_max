@@ -42,7 +42,8 @@ class Products with ChangeNotifier {
 
   //var _showFavoritesOnly = false;
   final String authToken;
-  Products(this.authToken, this._items);
+  final String userId;
+  Products(this.authToken, this.userId ,this._items);
 
   List<Product> get items {
 //    if(_showFavoritesOnly) {
@@ -71,8 +72,9 @@ class Products with ChangeNotifier {
   }
 */
 
-  Future<void> fetchAndSetProducts() async {
-    final url = 'https://shop-max1.firebaseio.com/products.json?auth=$authToken';
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
+    final filterString = filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : '';
+    var url = 'https://shop-max1.firebaseio.com/products.json?auth=$authToken&$filterString';
     try {
       final response = await http.get(url);
       //print(json.decode(response.body));
@@ -81,6 +83,9 @@ class Products with ChangeNotifier {
       if(extractedData == null) {
         return;
       }
+      url = 'https://shop-max1.firebaseio.com/userFavoriets/$userId.json?auth=$authToken';
+      final favoriteResponse = await http.get(url);
+      final favoriteData = json.decode(favoriteResponse.body);
       extractedData.forEach((prodId, prodData) {
         loadedProducts.add(Product(
           id: prodId,
@@ -88,7 +93,7 @@ class Products with ChangeNotifier {
           description: prodData['description'],
           price: prodData['price'],
           imageUrl: prodData['imageUrl'],
-          isFavorite: prodData['isFavorite'],
+          isFavorite:favoriteData == null ? false : favoriteData[prodId] ?? false,
         ));
       });
       _items = loadedProducts;
@@ -108,7 +113,7 @@ class Products with ChangeNotifier {
           'description': product.description,
           'imageUrl': product.imageUrl,
           'price': product.price,
-          'isFavorite': product.isFavorite,
+          'creatorId': userId,
         }),
       );
       final newProduct = Product(

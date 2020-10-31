@@ -43,5 +43,6 @@
   "select_language": "Select Language",
   "change_language": "Change Language",
   "deleting_failed": "Deleting failed",
-  "deleting_successful": "Deleting successful"
+  "deleting_successful": "Deleting successful",
+  "logout": "Logout"
 }

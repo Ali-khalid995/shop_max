@@ -23,8 +23,7 @@ class ProductItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final product = Provider.of<Product>(context, listen: false);
     final cart = Provider.of<Cart>(context, listen: false);
-    final authData = Provider.of<Auth>(context,listen: false);
-
+    final authData = Provider.of<Auth>(context, listen: false);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -53,7 +52,10 @@ class ProductItem extends StatelessWidget {
               icon: Icon(
                   product.isFavorite ? Icons.favorite : Icons.favorite_border),
               onPressed: () {
-                product.toggleFavoriteStatus(authData.token);
+                product.toggleFavoriteStatus(
+                  authData.token,
+                  authData.userId,
+                );
               },
               color: Theme.of(context).accentColor,
             ),
@@ -70,9 +72,12 @@ class ProductItem extends StatelessWidget {
                 SnackBar(
                   content: Text(getTranslated(context, 'added_to_cart')),
                   duration: Duration(seconds: 1),
-                  action: SnackBarAction(label:'UNDO',onPressed: (){
-                    cart.removeSingleItem(product.id);
-                  },),
+                  action: SnackBarAction(
+                    label: 'UNDO',
+                    onPressed: () {
+                      cart.removeSingleItem(product.id);
+                    },
+                  ),
                 ),
               );
             },

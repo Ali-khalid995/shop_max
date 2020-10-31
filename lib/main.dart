@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:shop_max/localization/demo_localization.dart';
-import 'package:shop_max/localization/localization_constants.dart';
-import 'package:shop_max/providers/auth.dart';
-import 'package:shop_max/providers/cart.dart';
-import 'package:shop_max/providers/orders.dart';
-import 'package:shop_max/providers/products.dart';
-import 'package:shop_max/screens/auth_screen.dart';
-import 'package:shop_max/screens/cart_screen.dart';
-import 'package:shop_max/screens/edit_product_screen.dart';
-import 'package:shop_max/screens/orders_screen.dart';
-import 'package:shop_max/screens/product_detail_screen.dart';
-import 'package:shop_max/screens/products_overview_screen.dart';
-import 'package:shop_max/screens/settings_screen.dart';
-import 'package:shop_max/screens/user_products_screen.dart';
+import './localization/demo_localization.dart';
+import './localization/localization_constants.dart';
+import './providers/auth.dart';
+import './providers/cart.dart';
+import './providers/orders.dart';
+import './providers/products.dart';
+import './screens/auth_screen.dart';
+import './screens/cart_screen.dart';
+import './screens/edit_product_screen.dart';
+import './screens/orders_screen.dart';
+import './screens/product_detail_screen.dart';
+import './screens/products_overview_screen.dart';
+import './screens/settings_screen.dart';
+import './screens/splash_screen.dart';
+import './screens/user_products_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -32,8 +33,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Locale _locale;
-  Auth _auth;
-  Products _products;
+
 
   void setLocale(Locale locale) {
     setState(() {
@@ -61,6 +61,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProxyProvider<Auth, Products>(
           update: (ctx, auth, previousProducts) => Products(
             auth.token,
+            auth.userId,
             previousProducts == null ? [] : previousProducts.items,
           ),
         ),
@@ -79,11 +80,12 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProxyProvider<Auth, Orders>(
           update: (ctx, auth, previousOrders) => Orders(
             auth.token,
+            auth.userId,
             previousOrders == null ? [] : previousOrders.orders,
           ),
         ),
 
-    /*    ChangeNotifierProvider.value(
+        /*    ChangeNotifierProvider.value(
           value: Orders(),
           //create: (ctx) => Orders(),
         ),*/
@@ -116,7 +118,15 @@ class _MyAppState extends State<MyApp> {
             }
             return supportedLocales.first;
           },
-          home: auth.isAuth ? ProductOverviewScreen() : AuthScreen(),
+          home: auth.isAuth
+              ? ProductOverviewScreen()
+              : FutureBuilder(
+                  future: auth.tryAutoLogin(),
+                  builder: (ctx, authResultSnapshot) =>
+                      authResultSnapshot.connectionState ==
+                              ConnectionState.waiting
+                          ? SplashScreen()
+                          : AuthScreen()),
           routes: {
 //            AuthScreen.routeName: (ctx) => AuthScreen(),
             ProductOverviewScreen.routeName: (ctx) => ProductOverviewScreen(),

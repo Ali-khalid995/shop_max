@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shop_max/localization/localization_constants.dart';
+import 'package:shop_max/providers/auth.dart';
 import 'package:shop_max/screens/orders_screen.dart';
 import 'package:shop_max/screens/products_overview_screen.dart';
 import 'package:shop_max/screens/settings_screen.dart';
@@ -46,6 +48,16 @@ class AppDrawer extends StatelessWidget {
             title: Text(getTranslated(context, 'settings')),
             onTap: (){
               Navigator.of(context).pushReplacementNamed(SettingsScreen.routeName);
+            },
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.exit_to_app),
+            title: Text(getTranslated(context, 'logout')),
+            onTap: (){
+              Navigator.of(context).pop();
+              Provider.of<Auth>(context, listen: false).logout();
+              Navigator.of(context).pushReplacementNamed('/');
             },
           ),
         ],
